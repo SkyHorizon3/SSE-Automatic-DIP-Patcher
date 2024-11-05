@@ -1,0 +1,14 @@
+{
+  "name": "automaticdippatcher",
+  "version-semver": "1.0.0",
+  "description": "",
+  "license": "GPL-3.0",
+  "dependencies": [
+    "simpleini",
+    "spdlog",
+    "directxtk",
+    "catch2",
+    "rapidcsv"
+  ],
+  "builtin-baseline": "7eb700c9688daed6d8bdcdc571ebe3eedea6a774"
+}
