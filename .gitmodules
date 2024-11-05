@@ -2,3 +2,6 @@
 	path = extern/CommonLibSSE-NG
 	url = https://github.com/alandtse/CommonLibVR.git
 	branch = ng
+[submodule "extern/glaze"]
+	path = extern/glaze
+	url = https://github.com/stephenberry/glaze.git
