@@ -4,11 +4,6 @@
 
 void Manager::RunPostLoad()
 {
-	if (m_enablePopupWindow)
-	{
-		Hooks::InstallHooks();
-	}
-
 	if (m_enableWriteJSON)
 	{
 		if (!writeJson(getPresetPath(), getDIPPatches()))
@@ -16,6 +11,11 @@ void Manager::RunPostLoad()
 			m_errors.emplace_back("writeJSON failed!");
 		}
 		return;
+	}
+
+	if (m_enablePopupWindow)
+	{
+		Hooks::InstallHooks();
 	}
 
 	// read jsons, get DIP and patch, Display stuff in popup
@@ -130,11 +130,10 @@ bool Manager::writeJson(const std::filesystem::path& path, const std::vector<Con
 
 void Manager::readConfigs()
 {
-	static constexpr const char* presetDirectory = "Data\\SKSE\\Plugins\\AutomaticDIPPatcher";
-	if (!std::filesystem::exists(presetDirectory))
+	if (!std::filesystem::exists(m_configDirectory))
 		return;
 
-	for (const auto& config : std::filesystem::recursive_directory_iterator(presetDirectory))
+	for (const auto& config : std::filesystem::recursive_directory_iterator(m_configDirectory))
 	{
 		if (config.is_regular_file() && config.path().filename().extension() == ".json")
 		{
@@ -147,10 +146,8 @@ void Manager::readConfigs()
 
 std::string Manager::getPresetPath()
 {
-	static constexpr const char* configDirectory = "Data\\SKSE\\Plugins\\AutomaticDIPPatcher";
-
-	if (!std::filesystem::exists(configDirectory))
-		std::filesystem::create_directories(configDirectory);
+	if (!std::filesystem::exists(m_configDirectory))
+		std::filesystem::create_directories(m_configDirectory);
 
 	std::string configName{};
 	int configNumber = 0;
@@ -158,9 +155,9 @@ std::string Manager::getPresetPath()
 	{
 		configName = "Default" + std::to_string(configNumber) + ".json";
 		configNumber++;
-	} while (std::filesystem::exists(std::string(configDirectory) + "\\" + configName));
+	} while (std::filesystem::exists(std::string(m_configDirectory) + "\\" + configName));
 
-	return std::string(configDirectory) + "\\" + configName;
+	return std::string(m_configDirectory) + "\\" + configName;
 }
 
 std::vector<Manager::Config> Manager::getDIPPatches()
@@ -200,9 +197,9 @@ std::filesystem::path Manager::getDIPPath()
 			const auto filepath = entry.path();
 			const auto wstringFilepath = filepath.wstring();
 			const auto version = getEXEVersion(wstringFilepath.c_str());
-			if (version >= Version(2, 0, 2, 0))
+			if (version.has_value() && version.value() >= REL::Version(2, 0, 2, 0))
 			{
-				SKSE::log::info("Path of used DIP: {} - Version: {}", filepath.string(), version.toString());
+				SKSE::log::info("Path of used DIP: {} - Version: {}", filepath.string(), version.value().string());
 				return std::filesystem::current_path() / filepath;
 			}
 		}
@@ -213,7 +210,7 @@ std::filesystem::path Manager::getDIPPath()
 	return "";
 }
 
-Version Manager::getEXEVersion(const LPCWSTR& szVersionFile)
+std::optional<REL::Version> Manager::getEXEVersion(const LPCWSTR& szVersionFile)
 {
 	// some information from: https://stackoverflow.com/questions/940707/how-do-i-programmatically-get-the-version-of-a-dll-or-exe-file
 	DWORD verHandle = 0;
@@ -224,35 +221,30 @@ Version Manager::getEXEVersion(const LPCWSTR& szVersionFile)
 	if (verSize == 0)
 	{
 		m_errors.emplace_back("Error when retrieving the version size of DIP_cli.exe!");
-		return Version();
+		return std::nullopt;
 	}
 
-	std::vector<char> verData(verSize);
+	std::vector<BYTE> verData(verSize);
 	if (!GetFileVersionInfo(szVersionFile, verHandle, verSize, verData.data()))
 	{
 		m_errors.emplace_back("Error when retrieving the version information of DIP_cli.exe!");
-		return Version();
+		return std::nullopt;
 	}
 
 	if (!VerQueryValue(verData.data(), L"\\", (VOID FAR * FAR*) & lpBuffer, &size) || size == 0)
 	{
 		m_errors.emplace_back("Error when retrieving the version of DIP_cli.exe!");
-		return Version();
+		return std::nullopt;
 	}
 
 	VS_FIXEDFILEINFO* verInfo = (VS_FIXEDFILEINFO*)lpBuffer;
 	if (verInfo->dwSignature != 0xfeef04bd)
 	{
 		m_errors.emplace_back("Invalid signature in the version information of DIP_cli.exe!");
-		return Version();
+		return std::nullopt;
 	}
 
-	const int major = (verInfo->dwFileVersionMS >> 16) & 0xffff;
-	const int minor = (verInfo->dwFileVersionMS >> 0) & 0xffff;
-	const int patch = (verInfo->dwFileVersionLS >> 16) & 0xffff;
-	const int build = (verInfo->dwFileVersionLS >> 0) & 0xffff;
-
-	return Version(major, minor, patch, build);
+	return REL::Version(HIWORD(verInfo->dwFileVersionMS), LOWORD(verInfo->dwFileVersionMS), HIWORD(verInfo->dwFileVersionLS), LOWORD(verInfo->dwFileVersionLS));
 }
 
 bool Manager::executeDIP(const std::filesystem::path& path)
