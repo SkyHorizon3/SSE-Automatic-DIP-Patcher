@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(AutomaticDIPPatcher VERSION 1.0.0 LANGUAGES CXX)
+project(AutomaticPatcher VERSION 1.0.0 LANGUAGES CXX)
 
 # Set your project version and specify C++ standard
 set(CMAKE_CXX_STANDARD 23)

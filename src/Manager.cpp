@@ -8,27 +8,34 @@ void Manager::RunPostLoad()
 	{
 		if (!writeJson(getPresetPath(), getDIPPatches()))
 		{
-			m_errors.emplace_back("writeJSON failed!");
+			m_errors.emplace_back("Automatic json writing failed!");
 		}
 		return;
 	}
-
-	if (m_enablePopupWindow)
-	{
-		Hooks::InstallHooks();
-	}
-
-	// read jsons, get DIP and patch, Display stuff in popup
 
 	readConfigs();
 
 	if (m_configInformation.empty())
 		return;
 
-	const auto DIPPath = getDIPPath();
+	if (m_enablePopupWindow)
+	{
+		Hooks::InstallHooks();
+	}
 
+	const auto DIPPath = getDIPPath();
 	m_success = executeDIP(DIPPath);
 
+	for (const auto& [jsonPath, config] : m_configInformation)
+	{
+		if (!writeJson(jsonPath, config))
+		{
+			m_errors.emplace_back(std::format("Saving of json: {} failed!", jsonPath.string()));
+		}
+	}
+
+	for (const auto& error : m_errors)
+		SKSE::log::error("{}", error);
 }
 
 void Manager::loadINI()
@@ -172,12 +179,13 @@ std::vector<Manager::Config> Manager::getDIPPatches()
 #
 			if (folderName.find("dip") != std::string::npos)
 			{
-				const std::filesystem::path patchDir = entry.path() / "Patch";
+				const std::filesystem::path patchDir = entry.path() / "patch";
 
 				if (std::filesystem::exists(Utils::tolower(patchDir.string())))
 				{
 					dipPatches.emplace_back(entry.path(), false);
 				}
+
 			}
 		}
 	}
@@ -255,9 +263,9 @@ bool Manager::executeDIP(const std::filesystem::path& path)
 	static const std::filesystem::path currentPath = std::filesystem::current_path();
 	static const std::filesystem::path currentDataPath = currentPath / "data";
 
-	for (const auto& [jsonPath, config] : m_configInformation)
+	for (auto& [jsonPath, config] : m_configInformation)
 	{
-		for (const auto& info : config)
+		for (auto& info : config)
 		{
 			const auto patchPath = currentPath / info.patchPath;
 
@@ -288,6 +296,8 @@ bool Manager::executeDIP(const std::filesystem::path& path)
 				WaitForSingleObject(pi.hProcess, INFINITE);
 				CloseHandle(pi.hProcess);
 				CloseHandle(pi.hThread);
+
+				info.alreadyPatched = true;
 			}
 			else
 			{

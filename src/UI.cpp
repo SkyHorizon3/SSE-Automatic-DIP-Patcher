@@ -72,7 +72,7 @@ void UI::Draw()
 		const auto manager = Manager::GetSingleton();
 
 		const bool success = manager->getSuccess();
-		const auto statusMessage = success ? "Success!"sv : "Failed!"sv;
+		const auto statusMessage = success ? "Patching was successful!"sv : "Patching failed!"sv;
 		const auto statusColor = success ? ImVec4(0.0f, 1.0f, 0.0f, 1.0f) : ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
 
 		CenteredTextColored(statusColor, statusMessage.data());
@@ -80,7 +80,14 @@ void UI::Draw()
 		const auto errors = manager->getErrors();
 		if (!errors.empty())
 		{
-			CenteredText(std::format("{} errors occurred!", errors.size()));
+			if (errors.size() > 1)
+			{
+				CenteredText(std::format("{} errors occurred!", errors.size()));
+			}
+			else
+			{
+				CenteredText(std::format("{} error occurred!", errors.size()));
+			}
 			CenteredText("Issues written to:");
 			CenteredText(std::format("{}.log", SKSE::PluginDeclaration::GetSingleton()->GetName()));
 		}

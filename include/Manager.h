@@ -6,14 +6,13 @@ public:
 
 	void loadINI();
 	void RunPostLoad();
-	void RunDataLoaded();
 	std::vector<std::string> getErrors() const { return m_errors; }
 	bool getSuccess() const { return m_success; }
 	bool getDebugLogState() const { return m_enableDebugLog; }
 
 private:
 
-	const std::string m_configDirectory = "Data\\SKSE\\Plugins\\AutomaticDIPPatcher\\DIP";
+	const std::string m_configDirectory = "Data\\SKSE\\Plugins\\AutomaticPatcher\\DIP";
 
 	struct Config
 	{
