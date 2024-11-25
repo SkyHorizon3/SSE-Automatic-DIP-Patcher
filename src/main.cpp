@@ -1,24 +1,5 @@
 ﻿#include "Manager.h"
 
-void MessageListener(SKSE::MessagingInterface::Message* message)
-{
-	switch (message->type)
-	{
-		// https://github.com/ianpatt/skse64/blob/09f520a2433747f33ae7d7c15b1164ca198932c3/skse64/PluginAPI.h#L193-L212
-	case SKSE::MessagingInterface::kDataLoaded:
-	{
-		//Manager::GetSingleton()->RunDataLoaded();
-
-	}
-	break;
-
-
-	default:
-		break;
-
-	}
-}
-
 #define DLLEXPORT __declspec(dllexport)
 extern "C" DLLEXPORT constinit auto SKSEPlugin_Version = []()
 	{
@@ -64,8 +45,6 @@ SKSEPluginLoad(const SKSE::LoadInterface* skse)
 	SKSE::log::info("Game version: {}", skse->RuntimeVersion());
 
 	manager->RunPostLoad();
-
-	SKSE::GetMessagingInterface()->RegisterListener(MessageListener);
 
 	return true;
 }

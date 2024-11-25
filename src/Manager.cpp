@@ -176,7 +176,7 @@ std::vector<Manager::Config> Manager::getDIPPatches()
 		if (entry.is_directory())
 		{
 			const std::string folderName = Utils::tolower(entry.path().string());
-#
+
 			if (folderName.find("dip") != std::string::npos)
 			{
 				const std::filesystem::path patchDir = entry.path() / "patch";
