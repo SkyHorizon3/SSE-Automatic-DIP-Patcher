@@ -5,7 +5,7 @@ extern "C" DLLEXPORT constinit auto SKSEPlugin_Version = []()
 	{
 		SKSE::PluginVersionData v;
 		v.PluginName(Plugin::NAME);
-		v.AuthorName("SkyHorizon");
+		v.AuthorName("SkyHorizon"sv);
 		v.PluginVersion(Plugin::VERSION);
 		v.UsesAddressLibrary();
 		v.UsesNoStructs();

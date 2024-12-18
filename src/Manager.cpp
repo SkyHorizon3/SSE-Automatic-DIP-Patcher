@@ -200,7 +200,7 @@ std::filesystem::path Manager::getDIPPath()
 
 	for (const auto& entry : std::filesystem::recursive_directory_iterator(searchPath))
 	{
-		if (entry.is_regular_file() && entry.path().filename() == "DIP_cli.exe")
+		if (entry.is_regular_file() && entry.path().filename() == "DIP.exe")
 		{
 			const auto filepath = entry.path();
 			const auto wstringFilepath = filepath.wstring();
@@ -228,27 +228,27 @@ std::optional<REL::Version> Manager::getEXEVersion(const LPCWSTR& szVersionFile)
 
 	if (verSize == 0)
 	{
-		m_errors.emplace_back("Error when retrieving the version size of DIP_cli.exe!");
+		m_errors.emplace_back("Error when retrieving the version size of DIP.exe!");
 		return std::nullopt;
 	}
 
 	std::vector<BYTE> verData(verSize);
 	if (!GetFileVersionInfo(szVersionFile, verHandle, verSize, verData.data()))
 	{
-		m_errors.emplace_back("Error when retrieving the version information of DIP_cli.exe!");
+		m_errors.emplace_back("Error when retrieving the version information of DIP.exe!");
 		return std::nullopt;
 	}
 
 	if (!VerQueryValue(verData.data(), L"\\", (VOID FAR * FAR*) & lpBuffer, &size) || size == 0)
 	{
-		m_errors.emplace_back("Error when retrieving the version of DIP_cli.exe!");
+		m_errors.emplace_back("Error when retrieving the version of DIP.exe!");
 		return std::nullopt;
 	}
 
 	VS_FIXEDFILEINFO* verInfo = (VS_FIXEDFILEINFO*)lpBuffer;
 	if (verInfo->dwSignature != 0xfeef04bd)
 	{
-		m_errors.emplace_back("Invalid signature in the version information of DIP_cli.exe!");
+		m_errors.emplace_back("Invalid signature in the version information of DIP.exe!");
 		return std::nullopt;
 	}
 
