@@ -6,9 +6,9 @@ public:
 
 	void loadINI();
 	void RunPostLoad();
-	std::vector<std::string> getErrors() const { return m_errors; }
-	bool getSuccess() const { return m_success; }
-	bool getDebugLogState() const { return m_enableDebugLog; }
+	std::vector<std::string> getErrors() const noexcept { return m_errors; }
+	bool getSuccess() const noexcept { return m_success; }
+	bool getDebugLogState() const noexcept { return m_enableDebugLog; }
 
 private:
 

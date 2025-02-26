@@ -24,7 +24,6 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface*, 
 SKSEPluginLoad(const SKSE::LoadInterface* skse)
 {
 	SKSE::Init(skse, true);
-	SKSE::AllocTrampoline(28);
 
 	const auto manager = Manager::GetSingleton();
 	manager->loadINI();

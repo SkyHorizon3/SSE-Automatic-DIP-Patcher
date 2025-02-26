@@ -20,6 +20,7 @@ void Manager::RunPostLoad()
 
 	if (m_enablePopupWindow)
 	{
+		SKSE::AllocTrampoline(28);
 		Hooks::InstallHooks();
 	}
 
@@ -54,22 +55,13 @@ void Manager::loadINI()
 
 bool Manager::readJson(const std::filesystem::path& path)
 {
-	std::ifstream openFile(path);
-	if (!openFile.is_open())
-	{
-		m_errors.emplace_back(std::format("Couldn't load JSON: {}!", path.string()));
-		return false;
-	}
-
-	std::stringstream buffer;
-	buffer << openFile.rdbuf();
-	const auto stringBuffer = buffer.str();
-
+	std::string buffer{};
 	glz::json_t json{};
-	const auto result = glz::read_json(json, stringBuffer);
+
+	const auto result = glz::read_file_json(json, path.string(), buffer);
 	if (result)
 	{
-		const std::string descriptive_error = glz::format_error(result, stringBuffer);
+		const std::string descriptive_error = glz::format_error(result, buffer);
 		m_errors.emplace_back(std::format("Error parsing JSON: {}", descriptive_error));
 		return false;
 	}
@@ -120,7 +112,7 @@ bool Manager::writeJson(const std::filesystem::path& path, const std::vector<Con
 		return false;
 	}
 
-	std::string buffer;
+	std::string buffer{};
 	const auto result = glz::write_json(vec, buffer);
 	if (result)
 	{
@@ -162,9 +154,9 @@ std::string Manager::getPresetPath()
 	{
 		configName = "Default" + std::to_string(configNumber) + ".json";
 		configNumber++;
-	} while (std::filesystem::exists(std::string(m_configDirectory) + "\\" + configName));
+	} while (std::filesystem::exists(m_configDirectory + "\\" + configName));
 
-	return std::string(m_configDirectory) + "\\" + configName;
+	return m_configDirectory + "\\" + configName;
 }
 
 std::vector<Manager::Config> Manager::getDIPPatches()
