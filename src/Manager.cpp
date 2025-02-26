@@ -10,13 +10,17 @@ void Manager::RunPostLoad()
 		{
 			m_errors.emplace_back("Automatic json writing failed!");
 		}
+		writeErrors();
 		return;
 	}
 
 	readConfigs();
 
 	if (m_configInformation.empty())
+	{
+		writeErrors();
 		return;
+	}
 
 	if (m_enablePopupWindow)
 	{
@@ -35,8 +39,7 @@ void Manager::RunPostLoad()
 		}
 	}
 
-	for (const auto& error : m_errors)
-		SKSE::log::error("{}", error);
+	writeErrors();
 }
 
 void Manager::loadINI()

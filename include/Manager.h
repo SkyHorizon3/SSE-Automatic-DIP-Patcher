@@ -31,6 +31,12 @@ private:
 	std::optional<REL::Version> getEXEVersion(const LPCWSTR& szVersionFile);
 	bool executeDIP(const std::filesystem::path& path);
 
+	void writeErrors() const
+	{
+		for (const auto& error : m_errors)
+			SKSE::log::error("{}", error);
+	}
+
 	std::unordered_map<std::filesystem::path, std::vector<Config>> m_configInformation;
 	std::vector<std::string> m_errors;
 	bool m_success = false;
