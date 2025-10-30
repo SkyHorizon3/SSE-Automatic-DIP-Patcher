@@ -37,7 +37,7 @@ private:
 			SKSE::log::error("{}", error);
 	}
 
-	std::unordered_map<std::filesystem::path, std::vector<Config>> m_configInformation;
+	std::map<std::filesystem::path, std::vector<Config>> m_configInformation;
 	std::vector<std::string> m_errors;
 	bool m_success = false;
 

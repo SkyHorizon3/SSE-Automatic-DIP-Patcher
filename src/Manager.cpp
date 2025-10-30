@@ -135,15 +135,28 @@ void Manager::readConfigs()
 	if (!std::filesystem::exists(m_configDirectory))
 		return;
 
-	for (const auto& config : std::filesystem::recursive_directory_iterator(m_configDirectory))
+	// collect then sort JSON files by filename for deterministic order
+	std::vector<std::filesystem::path> jsonFiles;
+	for (const auto& entry : std::filesystem::recursive_directory_iterator(m_configDirectory))
 	{
-		if (config.is_regular_file() && config.path().filename().extension() == ".json")
+		if (entry.is_regular_file() && entry.path().filename().extension() == ".json")
 		{
-			if (!readJson(config.path()))
-				continue;
+			jsonFiles.emplace_back(entry.path());
 		}
 	}
 
+	std::sort(jsonFiles.begin(), jsonFiles.end(), [](const auto& a, const auto& b) {
+		const auto an = a.filename().string();
+		const auto bn = b.filename().string();
+		if (an != bn)
+			return an < bn;
+		return a.string() < b.string();
+	});
+
+	for (const auto& path : jsonFiles)
+	{
+		readJson(path);
+	}
 }
 
 std::string Manager::getPresetPath()
@@ -176,7 +189,8 @@ std::vector<Manager::Config> Manager::getDIPPatches()
 			{
 				const std::filesystem::path patchDir = entry.path() / "patch";
 
-				if (std::filesystem::exists(Utils::tolower(patchDir.string())))
+				if (std::filesystem::exists(Utils::tolower(patchDir.string()))
+				)
 				{
 					dipPatches.emplace_back(entry.path(), false);
 				}
@@ -255,8 +269,8 @@ bool Manager::executeDIP(const std::filesystem::path& path)
 	if (path.empty())
 		return false;
 
-	static const std::filesystem::path currentPath = std::filesystem::current_path();
-	static const std::filesystem::path currentDataPath = currentPath / "data";
+	const std::filesystem::path currentPath = std::filesystem::current_path();
+	const std::filesystem::path currentDataPath = currentPath / "data";
 
 	for (auto& [jsonPath, config] : m_configInformation)
 	{
