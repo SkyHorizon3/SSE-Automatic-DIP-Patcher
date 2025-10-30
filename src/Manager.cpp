@@ -151,7 +151,7 @@ void Manager::readConfigs()
 		if (an != bn)
 			return an < bn;
 		return a.string() < b.string();
-	});
+		});
 
 	for (const auto& path : jsonFiles)
 	{
@@ -189,12 +189,10 @@ std::vector<Manager::Config> Manager::getDIPPatches()
 			{
 				const std::filesystem::path patchDir = entry.path() / "patch";
 
-				if (std::filesystem::exists(Utils::tolower(patchDir.string()))
-				)
+				if (std::filesystem::exists(Utils::tolower(patchDir.string())))
 				{
 					dipPatches.emplace_back(entry.path(), false);
 				}
-
 			}
 		}
 	}
@@ -230,10 +228,11 @@ std::filesystem::path Manager::getDIPPath()
 std::optional<REL::Version> Manager::getEXEVersion(const LPCWSTR& szVersionFile)
 {
 	// some information from: https://stackoverflow.com/questions/940707/how-do-i-programmatically-get-the-version-of-a-dll-or-exe-file
-	DWORD verHandle = 0;
+	std::uint32_t verHandle = 0;
 	UINT size = 0;
 	LPBYTE lpBuffer = NULL;
-	DWORD verSize = GetFileVersionInfoSize(szVersionFile, &verHandle);
+
+	std::uint32_t verSize = REX::W32::GetFileVersionInfoSizeW(szVersionFile, &verHandle);
 
 	if (verSize == 0)
 	{
@@ -242,13 +241,13 @@ std::optional<REL::Version> Manager::getEXEVersion(const LPCWSTR& szVersionFile)
 	}
 
 	std::vector<BYTE> verData(verSize);
-	if (!GetFileVersionInfo(szVersionFile, verHandle, verSize, verData.data()))
+	if (!REX::W32::GetFileVersionInfoW(szVersionFile, verHandle, verSize, verData.data()))
 	{
 		m_errors.emplace_back("Error when retrieving the version information of DIP.exe!");
 		return std::nullopt;
 	}
 
-	if (!VerQueryValue(verData.data(), L"\\", (VOID FAR * FAR*) & lpBuffer, &size) || size == 0)
+	if (!REX::W32::VerQueryValueW(verData.data(), L"\\", (VOID FAR * FAR*) & lpBuffer, &size) || size == 0)
 	{
 		m_errors.emplace_back("Error when retrieving the version of DIP.exe!");
 		return std::nullopt;
@@ -282,14 +281,15 @@ bool Manager::executeDIP(const std::filesystem::path& path)
 
 			SKSE::log::debug("Running DIP command: {}", Utils::wstringToString(command));
 
-			STARTUPINFO si;
-			PROCESS_INFORMATION pi;
+			REX::W32::STARTUPINFOW si;
+			REX::W32::PROCESS_INFORMATION pi;
 
 			ZeroMemory(&si, sizeof(si));
-			si.cb = sizeof(si);
+			si.size = sizeof(si);
 			ZeroMemory(&pi, sizeof(pi));
 
-			if (CreateProcess(
+
+			if (REX::W32::CreateProcessW(
 				path.wstring().data(),
 				command.data(), // command.data()
 				NULL,
@@ -302,9 +302,9 @@ bool Manager::executeDIP(const std::filesystem::path& path)
 				&pi
 				))
 			{
-				WaitForSingleObject(pi.hProcess, INFINITE);
-				CloseHandle(pi.hProcess);
-				CloseHandle(pi.hThread);
+				WaitForSingleObject(pi.process, INFINITE);
+				CloseHandle(pi.process);
+				CloseHandle(pi.thread);
 
 				info.alreadyPatched = true;
 			}

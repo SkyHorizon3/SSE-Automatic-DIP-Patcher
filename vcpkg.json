@@ -1,14 +1,12 @@
 {
   "name": "automaticpatcher",
-  "version-semver": "1.0.0",
-  "description": "",
+  "version-semver": "1.0.1",
+  "description": "Automatic Patcher",
   "license": "GPL-3.0",
   "dependencies": [
     "simpleini",
-    "spdlog",
-    "directxtk",
-    "catch2",
-    "rapidcsv"
+    "commonlibsse-ng",
+    "glaze"
   ],
-  "builtin-baseline": "2dc91c6439568f694052c3fa25859dc78d9ff8e4"
+  "builtin-baseline": "8ce02b3d9a447071083436ad36f318dd19dd19ad"
 }

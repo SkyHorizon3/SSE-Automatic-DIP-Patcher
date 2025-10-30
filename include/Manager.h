@@ -1,6 +1,6 @@
 #pragma once
 
-class Manager : public ISingleton<Manager>
+class Manager : public REX::Singleton<Manager>
 {
 public:
 

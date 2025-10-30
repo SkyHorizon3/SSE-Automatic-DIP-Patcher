@@ -1,7 +1,7 @@
 #pragma once
 #include "imgui.h"
 
-class UI : public ISingleton<UI>
+class UI : public REX::Singleton<UI>
 {
 public:
 

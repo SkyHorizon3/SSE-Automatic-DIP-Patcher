@@ -40,13 +40,12 @@ if (CMAKE_GENERATOR MATCHES "Visual Studio")
     # Compiler and linker options
     set(SC_RELEASE_OPTS "/Zi;/fp:fast;/GL;/Gy-;/Gm-;/Gw;/sdl-;/GS-;/guard:cf-;/O2;/Ob2;/Oi;/Ot;/Oy;/fp:except-")
     
-    # Remove legacy /await to allow standard C++20 coroutines
     target_compile_options("${PROJECT_NAME}" PRIVATE
-        /MP /W4 /permissive- /Zc:alignedNew /Zc:auto /Zc:__cplusplus /Zc:externC /Zc:externConstexpr
+        /MP /W4 /WX /permissive- /Zc:alignedNew /Zc:auto /Zc:__cplusplus /Zc:externC /Zc:externConstexpr
         /Zc:forScope /Zc:hiddenFriend /Zc:implicitNoexcept /Zc:lambda /Zc:noexceptTypes /Zc:preprocessor /Zc:referenceBinding
         /Zc:rvalueCast /Zc:sizedDealloc /Zc:strictStrings /Zc:ternary /Zc:threadSafeInit /Zc:trigraphs /Zc:wchar_t
         /wd4200 # nonstandard extension used: zero-sized array in struct/union
-        "$<$<CONFIG:DEBUG>:/WX>"
+        
         "$<$<CONFIG:RELEASE>:/wd4702>" # unreachable code in glaze fast_float
     )
     
@@ -57,19 +56,19 @@ if (CMAKE_GENERATOR MATCHES "Visual Studio")
     target_compile_options("${PROJECT_NAME}" PUBLIC "$<$<CONFIG:RELEASE>:${SC_RELEASE_OPTS}>")
     
     target_link_options("${PROJECT_NAME}" PRIVATE
-        "$<$<CONFIG:DEBUG>:/WX>"
+        /WX
         "$<$<CONFIG:DEBUG>:/INCREMENTAL;/OPT:NOREF;/OPT:NOICF>"
         "$<$<CONFIG:RELEASE>:/LTCG;/INCREMENTAL:NO;/OPT:REF;/OPT:ICF;/DEBUG:FULL>"
     )
 endif()
 
-# Find required packages (adjust as needed)
-add_subdirectory(${CMAKE_SOURCE_DIR}/extern/CommonLibSSE-NG CommonLibSSE)
-add_subdirectory(${CMAKE_SOURCE_DIR}/extern/glaze glaze)
-
 include_directories(${CMAKE_SOURCE_DIR}/extern/imgui)
 add_subdirectory(${CMAKE_SOURCE_DIR}/extern/imgui ImGui)
-find_package(spdlog CONFIG REQUIRED)
+
+# Find required packages
+find_package(CommonLibSSE CONFIG REQUIRED)
+find_package(DirectXTK CONFIG REQUIRED)
+find_package(glaze CONFIG REQUIRED)
 
 # Include directories and libraries
 target_include_directories("${PROJECT_NAME}" PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -78,8 +77,8 @@ target_include_directories("${PROJECT_NAME}" PRIVATE ${CMAKE_CURRENT_BINARY_DIR}
 # Link libraries
 target_link_libraries("${PROJECT_NAME}" 
 PUBLIC 
-CommonLibSSE::CommonLibSSE
+CommonLibSSE::CommonLibSSE 
 PRIVATE
-ImGui
 glaze::glaze
+ImGui
 )

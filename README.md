@@ -36,16 +36,14 @@ Small SKSE plugin to run DIP patches automatically from JSON configs at game sta
 Tip: Set `EnableWriteJSON = true` in the INI to generate a preset JSON with discovered DIP installs.
 
 ## Build
-- Get submodules
-  - `git submodule update --init --recursive`
 - Visual Studio generator
-  - Configure Debug: `cmake -S . -B build/vs-debug --preset vs-debug`
-  - Build Debug: `cmake --build build/vs-debug --config Debug -j`
-  - Configure Release: `cmake -S . -B build/vs-release --preset vs-release`
-  - Build Release: `cmake --build build/vs-release --config Release -j`
+  - Configure Debug: `cmake -S . -B build/ALL --preset ALL`
+  - Build Debug: `cmake --build build/ALL --config Debug -j`
+  - Configure Release: `cmake -S . -B build/ALL --preset ALL`
+  - Build Release: `cmake --build build/ALL --config Release -j`
 - Output
-  - Debug DLL: `build/vs-debug/Debug/AutomaticPatcher.dll`
-  - Release DLL: `build/vs-release/Release/AutomaticPatcher.dll`
+  - Debug DLL: `build/ALL/Debug/AutomaticPatcher.dll`
+  - Release DLL: `build/ALL/Release/AutomaticPatcher.dll`
 
 ## Compatibility
 - Designed for CommonLibSSE-NG; supports SE/AE/VR
