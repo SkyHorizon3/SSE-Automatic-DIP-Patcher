@@ -30,10 +30,15 @@ private:
 	std::optional<REL::Version> getEXEVersion(const LPCWSTR& szVersionFile);
 	bool executeDIP(const std::filesystem::path& path);
 
-	void writeErrors() const
+	void writeErrors()
 	{
 		for (const auto& error : m_errors)
+		{
 			SKSE::log::error("{}", error);
+		}
+
+		m_errors.clear();
+		m_errors.shrink_to_fit();
 	}
 
 	std::map<std::filesystem::path, std::vector<Config>> m_configInformation;

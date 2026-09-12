@@ -38,6 +38,7 @@ void Manager::RunPostLoad()
 			m_errors.emplace_back(std::format("Saving of json: {} failed!", jsonPath.string()));
 		}
 	}
+	m_configInformation.clear();
 
 	writeErrors();
 }
@@ -302,11 +303,28 @@ bool Manager::executeDIP(const std::filesystem::path& path)
 				&pi
 				))
 			{
-				WaitForSingleObject(pi.process, INFINITE);
-				CloseHandle(pi.process);
-				CloseHandle(pi.thread);
+				REX::W32::WaitForSingleObject(pi.process, INFINITE);
 
-				info.alreadyPatched = true;
+				DWORD exitCode = 0;
+				if (GetExitCodeProcess(pi.process, &exitCode))
+				{
+					if (exitCode == 0)
+					{
+						info.alreadyPatched = true;
+					}
+					else
+					{
+						m_errors.emplace_back(std::format("{} failed with exit code {}", path.string(), exitCode));
+						info.alreadyPatched = false;
+					}
+				}
+				else
+				{
+					m_errors.emplace_back("GetExitCodeProcess failed!");
+				}
+
+				REX::W32::CloseHandle(pi.process);
+				REX::W32::CloseHandle(pi.thread);
 			}
 			else
 			{
