@@ -68,14 +68,14 @@ void UI::Draw()
 
 		const auto manager = Manager::GetSingleton();
 
-		const bool success = manager->getSuccess();
+		const auto errors = manager->getErrors();
+		const auto success = errors.empty();
 		const auto statusMessage = success ? "Patching was successful!"sv : "Patching failed!"sv;
 		const auto statusColor = success ? ImVec4(0.0f, 1.0f, 0.0f, 1.0f) : ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
 
 		CenteredTextColored(statusColor, statusMessage.data());
 
-		const auto errors = manager->getErrors();
-		if (!errors.empty())
+		if (!success)
 		{
 			if (errors.size() > 1)
 			{

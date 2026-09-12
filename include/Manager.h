@@ -7,7 +7,6 @@ public:
 	void loadINI();
 	void RunPostLoad();
 	std::vector<std::string> getErrors() const noexcept { return m_errors; }
-	bool getSuccess() const noexcept { return m_success; }
 	bool getDebugLogState() const noexcept { return m_enableDebugLog; }
 
 private:
@@ -36,14 +35,10 @@ private:
 		{
 			SKSE::log::error("{}", error);
 		}
-
-		m_errors.clear();
-		m_errors.shrink_to_fit();
 	}
 
 	std::map<std::filesystem::path, std::vector<Config>> m_configInformation;
 	std::vector<std::string> m_errors;
-	bool m_success = false;
 
 	// INI settings
 	bool m_enableDebugLog = false;

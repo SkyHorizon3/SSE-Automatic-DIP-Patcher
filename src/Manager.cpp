@@ -29,7 +29,7 @@ void Manager::RunPostLoad()
 	}
 
 	const auto DIPPath = getDIPPath();
-	m_success = executeDIP(DIPPath);
+	executeDIP(DIPPath);
 
 	for (const auto& [jsonPath, config] : m_configInformation)
 	{
@@ -288,7 +288,6 @@ bool Manager::executeDIP(const std::filesystem::path& path)
 			ZeroMemory(&si, sizeof(si));
 			si.size = sizeof(si);
 			ZeroMemory(&pi, sizeof(pi));
-
 
 			if (REX::W32::CreateProcessW(
 				path.wstring().data(),
