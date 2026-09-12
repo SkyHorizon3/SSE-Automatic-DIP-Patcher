@@ -1,19 +1,19 @@
 ﻿#include "Manager.h"
 
 #define DLLEXPORT __declspec(dllexport)
-extern "C" DLLEXPORT constinit auto SKSEPlugin_Version = []()
+SKSE_PLUGIN_VERSION = []()
 	{
 		SKSE::PluginVersionData v;
 		v.PluginName(Plugin::NAME);
-		v.AuthorName("SkyHorizon"sv);
 		v.PluginVersion(Plugin::VERSION);
+		v.AuthorName("SkyHorizon"sv);
 		v.UsesAddressLibrary();
 		v.UsesNoStructs();
 		return v;
 	}
 ();
 
-extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface*, SKSE::PluginInfo* pluginInfo)
+SKSE_PLUGIN_QUERY(const SKSE::QueryInterface*, SKSE::PluginInfo* pluginInfo)
 {
 	pluginInfo->name = SKSEPlugin_Version.pluginName;
 	pluginInfo->infoVersion = SKSE::PluginInfo::kVersion;
@@ -21,7 +21,7 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface*, 
 	return true;
 }
 
-SKSEPluginLoad(const SKSE::LoadInterface* skse)
+SKSE_PLUGIN_LOAD(const SKSE::LoadInterface* skse)
 {
 	SKSE::Init(skse, true);
 

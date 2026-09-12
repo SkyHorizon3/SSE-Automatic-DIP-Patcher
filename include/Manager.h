@@ -11,7 +11,6 @@ public:
 	bool getDebugLogState() const noexcept { return m_enableDebugLog; }
 
 private:
-
 	const std::string m_configDirectory = "Data\\SKSE\\Plugins\\AutomaticPatcher\\DIP";
 
 	struct Config

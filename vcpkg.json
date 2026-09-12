@@ -1,12 +1,15 @@
 {
   "name": "automaticpatcher",
-  "version-semver": "1.0.1",
+  "version-string": "1.0.2",
   "description": "Automatic Patcher",
-  "license": "GPL-3.0",
   "dependencies": [
-    "simpleini",
     "commonlibsse-ng",
-    "glaze"
+    "simpleini",
+    "glaze",
+    {
+      "name": "imgui",
+      "features": [ "dx11-binding", "win32-binding", "wchar32" ]
+    }
   ],
-  "builtin-baseline": "8ce02b3d9a447071083436ad36f318dd19dd19ad"
+  "builtin-baseline": "32305df7d0b9a308e6ac454dd98ebfe550342c09"
 }

@@ -1,8 +1,5 @@
 #include "UI.h"
 #include "Manager.h"
-#include <backends/imgui_impl_dx11.h>
-#include <backends/imgui_impl_win32.h>
-
 // Inspired by https://github.com/ersh1/OpenAnimationReplacer/tree/main. Credits to Ersh!
 
 void UI::Init()

@@ -58,8 +58,8 @@ void Manager::loadINI()
 
 bool Manager::readJson(const std::filesystem::path& path)
 {
-	std::string buffer{};
-	glz::json_t json{};
+	std::string buffer;
+	glz::json_t json;
 
 	const auto result = glz::read_file_json(json, path.string(), buffer);
 	if (result)
@@ -145,7 +145,7 @@ void Manager::readConfigs()
 		}
 	}
 
-	std::sort(jsonFiles.begin(), jsonFiles.end(), [](const auto& a, const auto& b) {
+	std::ranges::sort(jsonFiles.begin(), jsonFiles.end(), [](const auto& a, const auto& b) {
 		const auto an = a.filename().string();
 		const auto bn = b.filename().string();
 		if (an != bn)
@@ -279,7 +279,7 @@ bool Manager::executeDIP(const std::filesystem::path& path)
 
 			std::wstring command = L"\"" + path.wstring() + L"\" -s \"" + patchPath.wstring() + L"\" \"" + currentDataPath.wstring() + L"\"";
 
-			SKSE::log::debug("Running DIP command: {}", Utils::wstringToString(command));
+			SKSE::log::debug("Running DIP command: {}", stl::utf16_to_utf8(command).value_or("ERROR"));
 
 			REX::W32::STARTUPINFOW si;
 			REX::W32::PROCESS_INFORMATION pi;

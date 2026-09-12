@@ -1,42 +1,40 @@
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO alandtse/CommonLibVR
-    REF f343b8cf75cace4ff942ef744ea34c406aa7f8e2
-    SHA512 817b4944a60775085590b0bab641226704dc7b3785d03e5e0931ecad419010c5848fab082552b6c8aed0b242a193cefa9b747afd9d2da60dc47d2d702922079e
+    REF c5424463bba9af0d75cde8640ba7ddd4cacb9e39
+    SHA512 7090a9f3c34930cd59d56dac6b35d86a6a74dad64161ad47f76556b0e49bfec8544f53e5d8abf70beee369ef8cfa70159823c1be42680cbb0958428c2074ed55
     HEAD_REF ng
 )
 
 vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH2
     REPO ValveSoftware/openvr
-    REF ebdea152f8aac77e9a6db29682b81d762159df7e
-    SHA512 4fb668d933ac5b73eb4e97eb29816176e500a4eaebe2480cd0411c95edfb713d58312036f15db50884a2ef5f4ca44859e108dec2b982af9163cefcfc02531f63
+    REF 60eb187801956ad277f1cae6680e3a410ee0873b
+    SHA512 bb85b4705e7095ac65df9969112b2df8930cee7917cc5f14231c5a0ffeed7a73ffa60727fd32f8786a403656f95a3ec0f80bf3ceabc5b8ede964aefb920bc718
     HEAD_REF master
 )
 
-file(GLOB OPENVR_FILES "${SOURCE_PATH2}/*")
+file(COPY "${SOURCE_PATH2}/" DESTINATION "${SOURCE_PATH}/extern/openvr")
 
-file(COPY ${OPENVR_FILES} DESTINATION "${SOURCE_PATH}/extern/openvr")
-
-vcpkg_configure_cmake(
+vcpkg_cmake_configure(
     SOURCE_PATH "${SOURCE_PATH}"
-    PREFER_NINJA
-    OPTIONS -DBUILD_TESTS=off -DSKSE_SUPPORT_XBYAK=on
+    OPTIONS
+        -DBUILD_TESTS=OFF 
+        -DSKSE_SUPPORT_XBYAK=ON
+        -DSKSE_SUPPORT_PATCH_SAFETY=OFF
 )
 
-vcpkg_install_cmake()
-vcpkg_cmake_config_fixup(PACKAGE_NAME CommonLibSSE CONFIG_PATH lib/cmake)
+vcpkg_cmake_install()
 vcpkg_copy_pdbs()
 
+vcpkg_cmake_config_fixup(CONFIG_PATH "lib/cmake/CommonLibSSE")
+
+file(INSTALL "${SOURCE_PATH}/cmake/CommonLibSSE.cmake" DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}")
 file(INSTALL "${SOURCE_PATH2}/headers/openvr.h" DESTINATION ${CURRENT_PACKAGES_DIR}/include)
-file(GLOB CMAKE_CONFIGS "${CURRENT_PACKAGES_DIR}/share/CommonLibSSE/CommonLibSSE/*.cmake")
-file(INSTALL ${CMAKE_CONFIGS} DESTINATION "${CURRENT_PACKAGES_DIR}/share/CommonLibSSE")
-file(INSTALL "${SOURCE_PATH}/cmake/CommonLibSSE.cmake" DESTINATION "${CURRENT_PACKAGES_DIR}/share/CommonLibSSE")
 
 file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/include")
-file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/share/CommonLibSSE/CommonLibSSE")
+file(REMOVE_RECURSE "${CURRENT_PACKAGES_DIR}/debug/share")
 
-file(
-    INSTALL "${SOURCE_PATH}/LICENSE"
-    DESTINATION "${CURRENT_PACKAGES_DIR}/share/${PORT}"
-    RENAME copyright)
+if(EXISTS "${SOURCE_PATH}/COPYING") # COPYING = new LICENSE
+    vcpkg_install_copyright(FILE_LIST "${SOURCE_PATH}/COPYING")
+endif() 
